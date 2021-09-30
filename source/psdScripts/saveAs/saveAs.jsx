@@ -1,34 +1,43 @@
 // Copyright (c) 2021 Tatsuya Nakamori
 
-var toolVersion = "1.0";
+// Tool Info
+var toolVersion = "0.0";
+
+// Global Variables
+var saveAsWindow;
 
 // jsonIOを使えるようにするためのセットアップ
 var jsonIOFile = new File($.fileName + "/../../site-packages/jsonIO/jsonIO.jsx");
 $.evalFile(jsonIOFile);
 
-var saveAsWindow;
+// configを読み込む
+var configFile = new File($.fileName + "/../preference/config.jsx");
+$.evalFile(configFile);
+
 
 function saveOptions() {
-    if (saveExtension == ".jpg") {
-        var jpgOptions = new JPEGSaveOptions()
-        jpgOptions.embedColorProfile = true
-        jpgOptions.quality = 10
-        jpgOptions.formatOptions = FormatOptions.STANDARDBASELINE
-        jpgOptions.matte = MatteType.NONE
+    if (saveExtension == "jpg") {
+        var jpgOptions = Config.jpgOptions();
+        for (var property in jpgOptions) {
+            var value = jpgOptions[property]
+
+        }
+        // jpgOptions.embedColorProfile = true
+        // jpgOptions.quality = 10
+        // jpgOptions.formatOptions = FormatOptions.STANDARDBASELINE
+        // jpgOptions.matte = MatteType.NONE
         return jpgOptions
 
-    } else if (saveExtension == ".png") {
-        var pngOptions = new PNGSaveOptions()
-        pngOptions.compression = 9  // 0 - 9
-        pngOptions.interlaced = false
+    } else if (saveExtension == "png") {
+        var pngOptions = Config.pngOptions();
+        // pngOptions.compression = 9  // 0 - 9
+        // pngOptions.interlaced = false
         return pngOptions
     }
-    return null
 }
 
 function save() {
     var folderObj = new Folder(SAVE_PATH)
-
     var files = folderObj.getFiles()
 
     var newVer = ("000" + String(files.length + 1)).slice(-3)
@@ -44,7 +53,7 @@ function save() {
     folderObj.execute()
 }
 
-function showWindow() {
+function showMainWindow() {
     // uiのpreferenceを読み込み
     var jsonPath = $.fileName + "/../preference/uistate.json";
     var uistate = JSONIO.load(jsonPath);
@@ -55,7 +64,7 @@ function showWindow() {
 
     var SAVE_PATH = "C:/Users/tnaka/Documents/_tmp/pictures"
     var filePrefix = "pic";
-    var saveExtension = ".png"
+    var saveExtension = "png"
 
     // Windowの作成
     var saveAsWindow = new Window("window", "SAVE AS ("+toolVersion+")", [0, 0, 250, 250])
@@ -76,10 +85,11 @@ function showWindow() {
 }
 
 function main() {
-    var bt = new BridgeTalk()
-    bt.target = "photoshop"
-    bt.body = showWindow.toString() + "\nshowWindow()"
-    bt.send()
+    // Show Window
+    var bt = new BridgeTalk();
+    bt.target = "photoshop";
+    bt.body = showMainWindow.toString() + "\nshowMainWindow()";
+    bt.send();
 }
 
 main();
